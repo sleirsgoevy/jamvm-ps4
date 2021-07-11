@@ -1,0 +1,79 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 1cf2e87..4bcc7e0 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -22,7 +22,7 @@
+ SUBDIRS = os interp classlib
+ DIST_SUBDIRS = os arch interp classlib
+ 
+-bin_PROGRAMS = jamvm
++bin_PROGRAMS = # jamvm
+ include_HEADERS = jni.h
+ 
+ lib_LTLIBRARIES = libjvm.la
+diff --git a/src/classlib/gnuclasspath/lib/Makefile.am b/src/classlib/gnuclasspath/lib/Makefile.am
+index d7d3523..b7874a8 100644
+--- a/src/classlib/gnuclasspath/lib/Makefile.am
++++ b/src/classlib/gnuclasspath/lib/Makefile.am
+@@ -20,7 +20,7 @@
+ ##
+ 
+ CP_LIB_DIR = ${with_classpath_install_dir}/share/classpath
+-GLIBJ_ZIP  = ${CP_LIB_DIR}/glibj.zip
++GLIBJ_ZIP  = ../../../../../classpath-0.99/lib/glibj.zip
+ 
+ SUBDIRS = jamvm java gnu sun
+ EXTRA_DIST = classes.zip README
+diff --git a/src/os/linux/os.c b/src/os/linux/os.c
+index f2f18c4..99bb51a 100644
+--- a/src/os/linux/os.c
++++ b/src/os/linux/os.c
+@@ -26,19 +26,14 @@
+ #include <sys/sysinfo.h>
+ 
+ #define __USE_GNU
++#define _GNU_SOURCE
+ #include <dlfcn.h>
+ #include <pthread.h>
+ 
+ #include "../../jam.h"
+ 
+ long long nativePhysicalMemory() {
+-    /* Long longs are used here because with PAE, a 32-bit
+-       machine can have more than 4GB of physical memory */
+-
+-    long long num_pages = sysconf(_SC_PHYS_PAGES);
+-    long long page_size = sysconf(_SC_PAGESIZE);
+-
+-    return num_pages * page_size;
++    return 0;
+ }
+ 
+ void *nativeStackBase() {
+diff --git a/src/os/linux/x86_64/init.c b/src/os/linux/x86_64/init.c
+index 9d55229..152cc74 100644
+--- a/src/os/linux/x86_64/init.c
++++ b/src/os/linux/x86_64/init.c
+@@ -19,6 +19,8 @@
+  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+  */
+ 
++#undef __linux__
++
+ #ifdef __linux__
+ #include <fpu_control.h>
+ #endif
+diff --git a/src/properties.c b/src/properties.c
+index b453d7b..69b1a69 100644
+--- a/src/properties.c
++++ b/src/properties.c
+@@ -122,7 +122,8 @@ char *getCwd() {
+                size *= 2;
+             else {
+                perror("Couldn't get cwd");
+-               exitVM(1);
++               cwd[0] = 0;
++               return cwd;
+             }
+         else
+             return cwd;

@@ -1,0 +1,93 @@
+diff --git a/native/jni/java-lang/java_lang_VMProcess.c b/native/jni/java-lang/java_lang_VMProcess.c
+index a6076f2..d82aaeb 100644
+--- a/native/jni/java-lang/java_lang_VMProcess.c
++++ b/native/jni/java-lang/java_lang_VMProcess.c
+@@ -178,7 +178,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
+ 			  + (dirString !=
+ 			     NULL ? 1 : 0)) * sizeof (*strings))) == NULL)
+     {
+-      strncpy (errbuf, "malloc failed", sizeof(errbuf));
++      strncpy (errbuf, "malloc failed", sizeof(errbuf)-1);
+       goto out_of_memory;
+     }
+ 
+@@ -209,7 +209,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
+   err = cpproc_forkAndExec(strings, newEnviron, fds, pipe_count, &pid, dir);
+   if (err != 0)
+     {
+-      strncpy(errbuf, cpnative_getErrorString (err), sizeof(errbuf));
++      strncpy(errbuf, cpnative_getErrorString (err), sizeof(errbuf)-1);
+       goto system_error;
+     }
+ 
+diff --git a/native/jni/java-net/java_net_VMNetworkInterface.c b/native/jni/java-net/java_net_VMNetworkInterface.c
+index 6582997..2b07de4 100644
+--- a/native/jni/java-net/java_net_VMNetworkInterface.c
++++ b/native/jni/java-net/java_net_VMNetworkInterface.c
+@@ -39,6 +39,7 @@ exception statement from your version. */
+ #include <config.h>
+ #endif /* HAVE_CONFIG_H */
+ 
++#include <stdint.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #ifdef HAVE_IFADDRS_H
+diff --git a/native/jni/java-nio/gnu_java_nio_VMChannel.c b/native/jni/java-nio/gnu_java_nio_VMChannel.c
+index 7899f0b..84a6e2d 100644
+--- a/native/jni/java-nio/gnu_java_nio_VMChannel.c
++++ b/native/jni/java-nio/gnu_java_nio_VMChannel.c
+@@ -76,6 +76,10 @@ exception statement from your version. */
+ #include <sys/filio.h>
+ #endif
+ 
++#ifndef FIONREAD
++#define FIONREAD 0x4004667f
++#endif
++
+ #define CONNECT_EXCEPTION "java/net/ConnectException"
+ #define IO_EXCEPTION "java/io/IOException"
+ #define SOCKET_EXCEPTION "java/net/SocketException"
+@@ -773,7 +777,7 @@ Java_gnu_java_nio_VMChannel_receive (JNIEnv *env,
+   if (JCL_init_buffer (env, &buf, dst) == -1)
+     JCL_ThrowException (env, IO_EXCEPTION, "loading buffer failed");
+ 
+-#ifndef HAVE_MSG_WAITALL
++#ifndef MSG_WAITALL
+ #define MSG_WAITALL       0
+ #endif
+ 
+diff --git a/native/jni/native-lib/cpnet.c b/native/jni/native-lib/cpnet.c
+index 154a7dd..9d4473f 100644
+--- a/native/jni/native-lib/cpnet.c
++++ b/native/jni/native-lib/cpnet.c
+@@ -37,6 +37,7 @@ exception statement from your version. */
+ 
+ #include "config.h"
+ #include <jni.h>
++#include <stdint.h>
+ #include <assert.h>
+ #include <sys/socket.h>
+ #include <sys/types.h>
+@@ -58,6 +59,10 @@ exception statement from your version. */
+ #include <sys/filio.h>
+ #endif
+ 
++#ifndef FIONREAD
++#define FIONREAD 0x4004667f
++#endif
++
+ #include "cpnet.h"
+ 
+ #define SOCKET_DEFAULT_TIMEOUT -1 /* milliseconds */
+diff --git a/native/jni/native-lib/cpnet.h b/native/jni/native-lib/cpnet.h
+index 979c363..ff8d153 100644
+--- a/native/jni/native-lib/cpnet.h
++++ b/native/jni/native-lib/cpnet.h
+@@ -42,6 +42,7 @@ exception statement from your version. */
+ #include <jcl.h>
+ #include <string.h>
+ 
++#include <stdint.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #ifdef HAVE_NETINET_IN_SYSTM_H

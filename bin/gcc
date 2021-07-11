@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+
+import os, sys
+
+inc1 = os.path.join(os.path.split(__file__)[0], '..', 'include')
+inc2 = os.path.join(os.path.split(__file__)[0], '..', 'zlib-headers')
+
+argv = sys.argv[:]
+argv[:1] = (os.path.split(__file__)[1], '-nostdinc', '-isystem', inc1, '-isystem', inc2)
+
+os.putenv('PATH', os.environ.get('PATH').split(':', 1)[1])
+os.execvp(argv[0], argv)
