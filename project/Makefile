@@ -5,7 +5,7 @@ TITLE_ID    := BREW00091
 CONTENT_ID  := IV0000-BREW00091_00-JVMHELLOWORLD000
 
 # Libraries linked into the ELF.
-LIBS        := -lc -lkernel
+LIBS        := -lc -lkernel -lSceNet
 
 # Additional compile flags.
 #EXTRAFLAGS  := 
@@ -77,7 +77,7 @@ $(INTDIR)/jamvm.o: ../jamvm.o
 
 eboot.bin: $(INTDIR) $(OBJS)
 	$(LD) $(OBJS) -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)
-	$(TOOLCHAIN)/bin/$(CDIR)/create-eboot -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf --paid 0x3800000000000011
+	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf -eboot=eboot.bin --paid 0x3800000000000011
 
 $(INTDIR)/%.o: $(PROJDIR)/%.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -86,7 +86,7 @@ $(INTDIR)/%.o: $(PROJDIR)/%.cpp
 	$(CCX) $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f $(CONTENT_ID).pkg pkg.gp4 pkg/sce_sys/param.sfo eboot.bin \
+	rm -f $(CONTENT_ID).pkg pkg.gp4 sce_sys/param.sfo eboot.bin \
 		$(INTDIR)/$(PROJDIR).elf $(INTDIR)/$(PROJDIR).oelf $(OBJS) \
 		assets/misc/*
 
